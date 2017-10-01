@@ -9,7 +9,7 @@ exports.create = functions.https.onRequest((request, response) => {
     var randomStr = randomstring.generate(6);
 
     var json = {
-        "p1" : [
+        "p1": [
             {
                 "x": 0,
                 "y": 0
@@ -17,8 +17,8 @@ exports.create = functions.https.onRequest((request, response) => {
         ]
     }
 
-    admin.database().ref("" + [randomStr]).set(json).then (function() {
-        response.send(JSON.stringify({ "id" : randomStr }));
+    admin.database().ref("" + [randomStr]).set(json).then(function () {
+        response.send(JSON.stringify({ "id": randomStr }));
     });
 });
 
@@ -26,7 +26,7 @@ exports.join = functions.https.onRequest((request, response) => {
     var randomStr = request.query.q;
 
     var json = {
-        "p1" : [
+        "p1": [
             {
                 "x": 0,
                 "y": 0
@@ -41,14 +41,14 @@ exports.join = functions.https.onRequest((request, response) => {
     }
 
     var ref = admin.database().ref("" + [randomStr]);
-    ref.once('value').then(function(snapshot) {
+    ref.once('value').then(function (snapshot) {
         if (snapshot.val() == null) {
             response.send(JSON.stringify({ "success": false }));
         }
     });
 
-    ref.set(json).then (function() {
-        response.send(JSON.stringify({ "id" : randomStr }));
+    ref.set(json).then(function () {
+        response.send(JSON.stringify({ "id": randomStr }));
     });
 });
 
@@ -57,10 +57,10 @@ exports.loser = functions.https.onRequest((request, response) => {
     var u = request.query.u;
 
     var json = {
-        "loser" : parseInt(u),
+        "loser": parseInt(u),
     }
 
-    admin.database().ref("" + [q]).set(json).then (function() {
+    admin.database().ref("" + [q]).set(json).then(function () {
         response.send(json);
     });
 });
@@ -72,20 +72,43 @@ exports.i = functions.https.onRequest((request, response) => {
 
     var ref = admin.database().ref("" + [q]);
 
-    ref.once('value').then(function(snapshot) {
+    ref.once('value').then(function (snapshot) {
         var json = snapshot.val();
 
         if (i != null && u != null && json != null) {
             var split = i.split(",");
-                
+
             var x = parseFloat(split[0]);
             var y = parseFloat(split[1]);
-                
-            json[u == 0 ? "p2" : "p1"].push({ "x":x, "y":y });
-                
+
+            json[u == 0 ? "p2" : "p1"].push({ "x": x, "y": y });
+
             ref.set(json);
-                
+
             response.redirect("../g?q=" + q + "&u=" + request.query.u);
+        }
+    });
+});
+
+exports.d = functions.https.onRequest((request, response) => {
+    var d = request.query.d;
+    var q = request.query.q;
+    var u = parseInt(request.query.u);
+
+    var ref = admin.database().ref("" + [q]);
+    ref.once('value').then(function (snapshot) {
+        var json = snapshot.val();
+
+        if (json != null) {
+            var entry = json[u == 0 ? "p1" : "p2"][d];
+
+            if (entry != null) {
+                json[u == 0 ? "p1" : "p2"].splice(d);
+
+                ref.set(json);
+
+                response.redirect("../g?q=" + q + "&u=" + Math.abs(1 - u));
+            }
         }
     });
 });
@@ -93,33 +116,20 @@ exports.i = functions.https.onRequest((request, response) => {
 exports.g = functions.https.onRequest((request, response) => {
     var q = request.query.q;
     var u = request.query.u != null ? Math.abs(1 - request.query.u) : null;
-    var d = request.query.d;
 
     var ref = admin.database().ref("" + [q]);
 
-    ref.once('value').then(function(snapshot) {
+    ref.once('value').then(function (snapshot) {
         var json = snapshot.val();
 
         if (json != null) {
-            if (d == null) {
-                if (u == null) {
-                    response.send(JSON.stringify(json));
-                } else {
-                    response.send(JSON.stringify(json[u == 0 ? "p1" : "p2"]));
-                }
-            } else if (d != null && u != null) {
-                var entry = json[u == 0 ? "p1" : "p2"][d];
-
-                if (entry != null) {
-                    json[u == 0 ? "p1" : "p2"].splice(d);
-
-                    ref.set(json);
-
-                    response.redirect("../g?q=" + Math.abs(1 - q));
-                }
+            if (u == null) {
+                response.send(JSON.stringify(json));
+            } else {
+                response.send(JSON.stringify(json[u == 0 ? "p1" : "p2"]));
             }
         }
 
-        response.send(JSON.stringify({ "success":false }));
+        response.send(JSON.stringify({ "success": false }));
     });
 });
