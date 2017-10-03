@@ -1,5 +1,6 @@
 # Chowdown - Game Jam Fall 2017
 
+## Description
 In an alternate universe, planets are sentient and chocolaty creatures with a burning desire 
 to destroy planets not of their own color. The game takes place in the Meatball System, a 
 dangerous system full of meatball fields. Countless crusades and meatball collision incidents 
@@ -9,3 +10,9 @@ create more chocolate as deadly projectiles. The two planets have constructed en
 of shielding themselves from enemy chocolate, while also able to absorb meatballs to fuel their own
 arsenal. While the fields cannot be made large enough to surround themselves, the planets are able 
 to control their orbit as needed. Who will be the last planet standing in the Meatball System?!
+
+## Dev Information
+This game was built using the Unity 3D game engine in C#.
+
+The backend was built in Node.JS using the Google Firebase Functions tool. The backend itself
+communicates with the Firebase Database as well.
